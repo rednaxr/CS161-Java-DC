@@ -19,6 +19,7 @@ public class Main implements ActionListener, Runnable {
     
     //Global Variable
     boolean simRunning = false;
+    double time = 0;
     
     //Graphical Components
     JFrame simFrame = new JFrame("Traffic Simulation");
@@ -98,15 +99,18 @@ public class Main implements ActionListener, Runnable {
         }
     }
 
+    //TODO: throughput.
     public void run() {
         while(simRunning == true) {
+        	time = System.currentTimeMillis();
             highway.increment();
             simFrame.repaint();
             try {
                 Thread.sleep(10);
             }
-            catch(InterruptedException ouch) {
+            catch(InterruptedException ex) {
             }
+            time = System.currentTimeMillis() - time;
         }
     }
 
