@@ -14,7 +14,6 @@ public class SportsCar extends Vehicle{
         w = 4;
         l = 5;
         v = 3;
-        yTarget = y;
         ghost = false;
     }
     

@@ -14,7 +14,6 @@ public class Semi extends Vehicle{
         w = 6;
         l = 12;
         v = 2;
-        yTarget = y;
         ghost = false;
     }
     

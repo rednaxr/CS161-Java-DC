@@ -1,50 +1,60 @@
 package com.test.util;
 
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JTextField;
+public class Main {
 
-public class Main implements ActionListener {
-	
-	String input;
-	
-	Scanner fileReader;
-	JFrame window = new JFrame("Sorty");
-	JButton btn = new JButton("Sort!");
-	JTextField tf = new JTextField();
+	//Global Variables & Objects
+    final double[] lanes = {13.2, 20.4, 27.6, 34.8};					//Stores the different lane y-values
+    String inputS;
+    Scanner reader = null;
+
 	
 	public Main() {
-		window.setSize(300,100);
-		window.setLocation(100, 100);
-		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		window.setVisible(true);
-		window.setLayout(new GridLayout(2, 1));
-		window.add(tf);
-		window.add(btn);
-		btn.addActionListener(this);
+		double y;
+		int dir;
+		Scanner reader = new Scanner(System.in);
+		System.out.println("y:");
+		System.out.print("> ");
+		inputS = reader.nextLine();
+		y = Double.parseDouble(inputS);
+		System.out.println("dir:");
+		System.out.print("> ");
+		inputS = reader.nextLine();
+		dir = Integer.parseInt(inputS);
+		y = nearestLane(y, dir);
+		System.out.println("yTarget: " + y);
+		reader.close();
 	}
 	
 	public static void main(String[] args) {
 		new Main();
 	}
-
-	public void actionPerformed(ActionEvent ae) {
-		if(ae.getSource().equals(btn)) {
-			try {
-				fileReader = new Scanner(new File(tf.getText()));
-				
-			}
-			catch(FileNotFoundException ex) {
-				ex.printStackTrace();
-			}
-		}
-	}
+	
+	
+    //Finds nearest lane in a particular direction to the nearest y value
+    private double nearestLane(double y, int direction) {
+    	double output = 0;
+    	ArrayList<Double> laneOptions = new ArrayList<Double>();    //create an ArrayList storing each of the lane y's
+        for(byte i = 0; i < lanes.length; i++) {
+        	laneOptions.add(lanes[i]);
+        }
+        for(byte i = 0; i < lanes.length; i++) {								//remove lanes that are below (or at) the current y (if going up in y, direction == 1)...
+        	if(Math.pow(y, direction) >= Math.pow(lanes[i], direction)) {		//...or that are above the current y (if going down in y, direction == -1)
+        		laneOptions.remove(lanes[i]);
+        	}
+        }
+        if(laneOptions.size() == 0) {										//If no lane options to change into in the given direction, return current y value
+        	output = y;
+        }
+        else if(direction > 0) {											//otherwise, if going up in y, pick lowest lane y value
+        	output = laneOptions.get(0);
+        }
+        else {																//or, if going down in y, pick tbe lowest lane value
+        	output = laneOptions.get(laneOptions.size() - 1);
+        }
+    	return output;
+    }
 	
 }

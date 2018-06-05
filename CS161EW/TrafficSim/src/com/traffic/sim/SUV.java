@@ -14,7 +14,6 @@ public class SUV extends Vehicle{
         w = 5;
         l = 7;
         v = 2.5;
-        yTarget = y;
         ghost = false;
     }
     

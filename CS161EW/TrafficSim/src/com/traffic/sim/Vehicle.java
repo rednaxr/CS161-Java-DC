@@ -13,16 +13,18 @@ public class Vehicle {
         x = X;
         y = Y;
         yTarget = y;
+        wait = 0;
     }
     
     //Vehicle Attributes:
-    double x;            //X position
-    double y;            //y position
-    double l;            //length
-    double w;            //width
-    double v;            //speed
-    double yTarget;        //which lane Y-value vehicle is trying to go to
-    boolean ghost;        //whether or not the vehicle is a ghost representation of a vehicle that has already looped
+    double x;            	//X position
+    double y;            	//y position
+    double l;            	//length
+    double w;            	//width
+    double v;            	//speed
+    double yTarget;         //which lane Y-value vehicle is trying to go to
+    int wait;				//number of increments for which vehicle has waited to make a lane change
+    boolean ghost;          //whether or not the vehicle is a ghost representation of a vehicle that has already looped
     
     public void paint(Graphics g, double screenWidth, double screenHeight) {
         g.setColor(Color.WHITE);                                                                    //paint vehicle more towards red the slower it goes
@@ -57,20 +59,28 @@ public class Vehicle {
         return v;
     }
     
-    public boolean isGhost() {
-        return ghost;
-    }
-    
-    public void setGhost(boolean G) {
-        ghost = G;
-    }
-    
     public double getYTarget() {
         return yTarget;
     }
     
     public void setYTarget(double yt) {
         yTarget = yt;
+    }
+    
+    public int getWait() {
+    	return wait;
+    }
+    
+    public void setWait(int wt) {
+    	wait = wt;
+    }
+    
+    public boolean isGhost() {
+        return ghost;
+    }
+    
+    public void setGhost(boolean G) {
+        ghost = G;
     }
     
 }

@@ -69,10 +69,10 @@ public class Highway extends JPanel {
     }
     
     //runs one increment of the simulation
-    public void increment() {
+    public int increment() {
         Vehicle v;
         Vehicle w = new Vehicle(0, 0);
-        int y;
+        int loopCount = 0;											//Stores number of vehicles who have looped in this increment
         for(int i = 0; i < traffic.size(); i++) {                    //for each vehicle:
             v = traffic.get(i);
             
@@ -87,24 +87,37 @@ public class Highway extends JPanel {
                         v.setY(v.getYTarget());                                                                          //if less than a step away, go exactly to the target lane's y
                     }
                 }
+                else {
+                	v.setWait(v.getWait() + 1);								//if vehicle will collide making lane change, add one increment to the wait count
+                	if(v.getWait() == 100) {								//if the vehicle has waited to make a lane change for 100 increments
+                		v.setWait(0);											//stop waiting (reset wait count)
+                		if(v.getYTarget() > v.getY()) {							//if target lane is higher y than current position, set yTarget to return to lane below
+                			v.setYTarget(nearestLane(v.getY(), -1));
+                		}
+                		else {													//if target is lower y than current position, set yTarget return to lane above
+                			v.setYTarget(nearestLane(v.getY(), 1));
+                		}
+                	}
+                }
             }
             
             //moving forward and looping
             if(!overlap(v, v.getX() + 1, v.getY())) {                //if the vehicle is not too close to colliding
                 v.setX(v.getX() + v.getV()/40);                        //move the vehicle forward
                 if(v.getX() + v.getL()/2 > 60 && !v.isGhost()) {    //if the vehicle has nosed over x = 60 and is not a ghost
-                    if(v.getL() == 12) {                            //if it's a semi, make a new semi at the beginning (to simulate looping)
-                        w = new Semi(v.getX() - 80, v.getY());
+                    if(v.getL() == 12) {                            //if it's a semi, make a new semi at the beginning (x = -20) (to simulate looping)
+                        w = new Semi(-20, v.getY());
                     }
                     else if(v.getL() == 7) {                        //make an SUV at the beginning if it's an SUV
-                        w = new SUV(v.getX() - 80, v.getY());
+                        w = new SUV(-20, v.getY());
                     }
                     else if(v.getL() == 5) {                        //likewise if it's a SportsCar
-                        w = new SportsCar(v.getX() - 80, v.getY());
+                        w = new SportsCar(-20, v.getY());
                     }
                     if(!overlap(w, w.getX(), w.getY())){                 //If w will not be overlapping w/ another vehicle:
                         traffic.add(w);                                  //add w to the flow of traffic
                         v.setGhost(true);                                //make the original vehicle a ghost
+                        loopCount++;									 //count that one vehicle has looped
                     }
 
                 }
@@ -125,8 +138,8 @@ public class Highway extends JPanel {
             if(v.getX() - v.getL()/2 > 120 && v.isGhost()) {                    //if the rear of a ghost vehicle passes x = 120, destroy it.
                 traffic.remove(v);
             }
-            //TODO: put y movement (below) before x movement (above?)
         }
+        return loopCount;
 
     }
     
@@ -143,10 +156,11 @@ public class Highway extends JPanel {
         Vehicle w;
         for(int i = 0; i < traffic.size(); i++) {        //check each vehicle
             w = traffic.get(i);
-            if(!v.equals(w) && (w.getY() + 6 > y && w.getY() - 6 <  y)                   //if v & w are not the same vehicle and at overlapping y levels
-                && ( (x <= w.getX() && (x + v.getL()/2 >= w.getX() - w.getL()/2))        //and either v is behind w and v's front end is in front of  w's back end
-                || (x >= w.getX() && (x - v.getL()/2 <= w.getX() + w.getL()/2))) ) {     //or w is behind v and w's front end is in front of v's back end
-                overlap = true;                                                          //w & v overlap
+            if(!v.equals(w) &&																			//if v & w are not the same vehicle
+            	(w.getY() + w.getW()/2 > y - v.getW()/2 && w.getY() - w.getW()/2 < y + v.getW()/2)      //and v & w are at at overlapping y levels
+                && ( (x <= w.getX() && (x + v.getL()/2 >= w.getX() - w.getL()/2))        				//and either v is behind w and v's front end is in front of  w's back end
+                || (x >= w.getX() && (x - v.getL()/2 <= w.getX() + w.getL()/2))) ) {     				//or w is behind v and w's front end is in front of v's back end
+                overlap = true;                                                          				//w & v overlap
             }
         }
         return overlap;
@@ -159,16 +173,19 @@ public class Highway extends JPanel {
         for(byte i = 0; i < lanes.length; i++) {
         	laneOptions.add(lanes[i]);
         }
-        for(byte i = 0; i < lanes.length; i++) {					//remove lanes that are below the current y (if going up in y, direction == 1)...
-        	if(Math.pow(y, direction) > Math.pow(lanes[i], direction)) {		//...or that are above the current y (if going down in y, direction == -1)
+        for(byte i = 0; i < lanes.length; i++) {								//remove lanes that are below (or at) the current y (if going up in y, direction == 1)...
+        	if(Math.pow(y, direction) >= Math.pow(lanes[i], direction)) {		//...or that are above the current y (if going down in y, direction == -1)
         		laneOptions.remove(lanes[i]);
         	}
         }
-        if(direction > 0) {											//if going up in y, pick highest lane value
-        	output = laneOptions.get(laneOptions.size() - 1);
+        if(laneOptions.size() == 0) {										//If no lane options to change into in the given direction, return current y value
+        	output = y;
         }
-        else {														//otherwise, pick lowest
+        else if(direction > 0) {											//otherwise, if going up in y, pick lowest lane y value
         	output = laneOptions.get(0);
+        }
+        else {																//or, if going down in y, pick tbe lowest lane value
+        	output = laneOptions.get(laneOptions.size() - 1);
         }
     	return output;
     }
