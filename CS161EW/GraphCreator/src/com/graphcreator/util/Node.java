@@ -22,11 +22,12 @@ public class Node {
 		color = Color.BLUE;
 	}
 	
+	//draws Node
 	public void paint(Graphics gr) {
-		gr.setColor(color);
+		gr.setColor(color);						//draw circle centered on x, y
 		gr.fillOval(x - 10, y - 10, 20, 20);
 		gr.setColor(Color.WHITE);
-		gr.drawString(label, x - 2, y + 5);
+		gr.drawString(label, x - 2, y + 5);		//draw label near x, y
 	}
 	
 	public int getX() {
@@ -65,11 +66,4 @@ public class Node {
 		return linkList;
 	}
 	
-	/*
-	public void paint(Graphics gr, double graphWidth, double graphHeight) {
-		gr.fillOval((int)Math.round(x*graphWidth/360 - 10), (int)Math.round(y*graphHeight/360 - 10), 20, 20);
-		gr.setColor(Color.WHITE);
-		gr.drawString(label, (int)Math.round(x), (int)Math.round(y));
-	}
-	*/
 }

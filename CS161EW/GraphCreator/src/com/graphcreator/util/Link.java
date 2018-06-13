@@ -17,10 +17,11 @@ public class Link {
 		color = Color.ORANGE;
 	}
 	
+	//draws link
 	public void paint(Graphics gr) {
-		gr.setColor(color);
+		gr.setColor(color);													//draw orange line from node to node
 		gr.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
-		gr.setColor(color.WHITE);
+		gr.setColor(color.WHITE);											//draw label in middle of line
 		gr.drawString(label, (start.getX() + end.getX())/2, (start.getY()+end.getY())/2);
 	}
 	
